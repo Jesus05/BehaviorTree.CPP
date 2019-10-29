@@ -14,8 +14,12 @@ SharedLibrary::SharedLibrary()
 void SharedLibrary::load(const std::string& path, int)
 {
     std::unique_lock<std::mutex> lock(_mutex);
-
+#ifdef _UNICODE
+    std::wstring upath(path.cbegin(), path.cend());
+    _handle = LoadLibrary(upath.c_str());
+#else
     _handle = LoadLibrary(path.c_str());
+#endif
     if (!_handle)
     {
         throw RuntimeError("Could not load library: " + path);
