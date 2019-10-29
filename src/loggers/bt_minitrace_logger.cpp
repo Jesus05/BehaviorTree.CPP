@@ -1,6 +1,9 @@
 
 #include "behaviortree_cpp/loggers/bt_minitrace_logger.h"
+
+namespace minitrace {
 #include "minitrace/minitrace.h"
+}
 
 namespace BT
 {
@@ -35,20 +38,23 @@ void MinitraceLogger::callback(Duration /*timestamp*/,
 
     const bool statusCompleted = (status == NodeStatus::SUCCESS || status == NodeStatus::FAILURE);
 
-    const std::string& category = toStr(node.type());
+    const std::string category = toStr(node.type());
+    std::list<std::string>::const_iterator iter = std::find(m_categorys.cbegin(), m_categorys.cend(), category);
+    if (iter == m_categorys.cend()) m_categorys.push_back(toStr(node.type()));
+    iter = --m_categorys.cend();
     const char* name = node.name().c_str();
 
     if (prev_status == NodeStatus::IDLE && statusCompleted)
     {
-        MTR_INSTANT(category.c_str(), name);
+        MTR_INSTANT(iter->c_str(), name);
     }
     else if (status == NodeStatus::RUNNING)
     {
-        MTR_BEGIN(category.c_str(), name);
+        MTR_BEGIN(iter->c_str(), name);
     }
     else if (prev_status == NodeStatus::RUNNING && statusCompleted)
     {
-        MTR_END(category.c_str(), name);
+        MTR_END(iter->c_str(), name);
     }
 }
 

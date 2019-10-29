@@ -3,12 +3,14 @@
 
 #include <cstring>
 #include "abstract_logger.h"
+#include <list>
 
 namespace BT
 {
 class MinitraceLogger : public StatusChangeLogger
 {
     static std::atomic<bool> ref_count;
+    std::list<std::string> m_categorys;
 
   public:
     MinitraceLogger(const BT::Tree& tree, const char* filename_json);
